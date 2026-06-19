@@ -1,6 +1,5 @@
 package org.example.magazin.dto;
 
-import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.List;
@@ -15,6 +14,7 @@ public class OrderDto {
     private String customer;
     private String address;
     private String phone;
+    private Long userId;
 
     @Getter @Setter @NoArgsConstructor @AllArgsConstructor
     public static class OrderItemDto {

@@ -8,6 +8,9 @@ import org.example.magazin.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,8 +32,8 @@ public class ProductService {
     @Value("${app.upload-dir:uploads}")
     private String uploadDir;
 
-    @Cacheable(value = "products", key = "#categoryId + '-' + #search + '-' + #sort")
-    public List<Product> findAll(Long categoryId, String search, String sort) {
+    @Cacheable(value = "products", key = "#categoryId + '-' + #search + '-' + #sort + '-' + #page + '-' + #size")
+    public Page<Product> findAll(Long categoryId, String search, String sort, int page, int size) {
         List<Product> products;
         if (categoryId != null) {
             products = productRepository.findByCategoryId(categoryId);
@@ -54,7 +57,10 @@ public class ProductService {
             }
         }
 
-        return products;
+        int start = page * size;
+        int end = Math.min(start + size, products.size());
+        List<Product> items = start < products.size() ? products.subList(start, end) : List.of();
+        return new PageImpl<>(items, PageRequest.of(page, size), products.size());
     }
 
     @Cacheable(value = "products", key = "'id-' + #id")

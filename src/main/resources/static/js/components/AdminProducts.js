@@ -45,13 +45,13 @@ function AdminProducts() {
   function loadData() {
     setLoading(true);
     Promise.all([
-      fetch('/api/products').then(function(r) { return r.json(); }),
+      fetch('/api/products?size=9999').then(function(r) { return r.json(); }),
       fetch('/api/categories').then(function(r) { return r.json(); })
     ])
     .then(function(_ref) {
-      var p = _ref[0];
+      var raw = _ref[0];
       var c = _ref[1];
-      setProducts(p);
+      setProducts(raw.content || raw);
       setCategories(c);
       setLoading(false);
     })
@@ -69,7 +69,7 @@ function AdminProducts() {
 
   function handleAdd() {
     if (!form.name || !form.price) { toast('error', 'Заполните все поля'); return; }
-    fetch('/api/products', {
+    fetchWithAuth('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -87,7 +87,7 @@ function AdminProducts() {
       if (selectedFile) {
         var fd = new FormData();
         fd.append('file', selectedFile);
-        return fetch('/api/products/' + created.id + '/image', { method: 'POST', body: fd }).then(function() { return created; });
+        return fetchWithAuth('/api/products/' + created.id + '/image', { method: 'POST', body: fd }).then(function() { return created; });
       }
       return created;
     })
@@ -116,7 +116,7 @@ function AdminProducts() {
 
   function handleSaveEdit() {
     if (!editForm.name || !editForm.price) { toast('error', 'Заполните все поля'); return; }
-    fetch('/api/products/' + editing.id, {
+    fetchWithAuth('/api/products/' + editing.id, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -137,7 +137,7 @@ function AdminProducts() {
       if (editSelectedFile) {
         var fd = new FormData();
         fd.append('file', editSelectedFile);
-        return fetch('/api/products/' + editing.id + '/image', { method: 'POST', body: fd });
+        return fetchWithAuth('/api/products/' + editing.id + '/image', { method: 'POST', body: fd });
       }
     })
     .then(function() {
@@ -150,7 +150,7 @@ function AdminProducts() {
 
   function handleDelete(id) {
     if (!confirm('Удалить товар?')) return;
-    fetch('/api/products/' + id, { method: 'DELETE' })
+    fetchWithAuth('/api/products/' + id, { method: 'DELETE' })
       .then(function(r) {
         if (!r.ok) throw new Error('Failed to delete');
         toast('success', 'Товар удалён');

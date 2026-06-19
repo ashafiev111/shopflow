@@ -8,6 +8,7 @@ function ProductDetail(_ref) {
   var cart = _React$useContext.cart;
   var dispatch = _React$useContext.dispatch;
   var toast = _React$useContext.toast;
+  var navigate = _React$useContext.navigate;
 
   var _React$useState = React.useState(null);
   var product = _React$useState[0];
@@ -48,7 +49,7 @@ function ProductDetail(_ref) {
     return React.createElement('div', { className: 'empty' },
       React.createElement('i', { className: 'ti ti-mood-sad' }),
       React.createElement('h3', null, '\u0422\u043E\u0432\u0430\u0440 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D'),
-      React.createElement('button', { className: 'btn btn-primary', style: { marginTop: 16 }, onClick: function() { setPage('catalog'); } },
+      React.createElement('button', { className: 'btn btn-primary', style: { marginTop: 16 }, onClick: function() { navigate('catalog'); } },
         React.createElement('i', { className: 'ti ti-arrow-left' }), ' \u0412 \u043A\u0430\u0442\u0430\u043B\u043E\u0433'
       )
     );
@@ -59,7 +60,7 @@ function ProductDetail(_ref) {
 
   return React.createElement('div', { className: 'product-detail' },
     React.createElement('div', { className: 'product-detail-back' },
-      React.createElement('button', { className: 'btn btn-ghost', onClick: function() { setPage('catalog'); } },
+      React.createElement('button', { className: 'btn btn-ghost', onClick: function() { navigate('catalog'); } },
         React.createElement('i', { className: 'ti ti-arrow-left' }), ' \u041D\u0430\u0437\u0430\u0434 \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433'
       )
     ),
@@ -93,7 +94,7 @@ function ProductDetail(_ref) {
           className: 'btn ' + (inCart ? 'btn-secondary' : 'btn-primary'),
           style: { width: '100%', justifyContent: 'center', padding: 12, fontSize: 15, marginTop: 8 },
           onClick: function() {
-            if (inCart) { setPage('cart'); return; }
+            if (inCart) { navigate('cart'); return; }
             dispatch({ type: 'ADD', product: product });
             toast('success', '\u00AB' + product.name + '\u00BB \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D \u0432 \u043A\u043E\u0440\u0437\u0438\u043D\u0443');
           },

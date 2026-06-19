@@ -30,7 +30,7 @@ function AdminCats() {
 
   function handleAdd() {
     if (!form.name) return;
-    fetch('/api/categories', {
+    fetchWithAuth('/api/categories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: form.name, icon: form.icon })
@@ -49,7 +49,7 @@ function AdminCats() {
   }
 
   function handleDelete(id) {
-    fetch('/api/categories/' + id, { method: 'DELETE' })
+    fetchWithAuth('/api/categories/' + id, { method: 'DELETE' })
       .then(function(r) {
         if (!r.ok) throw new Error('Failed to delete');
         toast('success', '\u041A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F \u0443\u0434\u0430\u043B\u0435\u043D\u0430');

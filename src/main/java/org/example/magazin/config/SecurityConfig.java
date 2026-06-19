@@ -4,23 +4,25 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exc -> exc
                 .authenticationEntryPoint((req, res, auth) -> {
                     res.setStatus(401);
@@ -29,46 +31,21 @@ public class SecurityConfig {
                 })
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/uploads/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/orders", "/api/auth/status").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register", "/api/orders").permitAll()
+                .requestMatchers("/api/users", "/api/users/**").hasRole("ADMIN")
+                .requestMatchers("/api/**").hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/uploads/**",
+                    "/cart", "/orders", "/admin", "/admin/**", "/product/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .formLogin(form -> form
-                .loginProcessingUrl("/api/auth/login")
-                .successHandler((req, res, auth) -> {
-                    res.setStatus(200);
-                    res.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    res.getWriter().write("{\"username\":\"" + auth.getName() + "\"}");
-                })
-                .failureHandler((req, res, exc) -> {
-                    res.setStatus(401);
-                    res.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    res.getWriter().write("{\"error\":\"Invalid credentials\"}");
-                })
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/api/auth/logout")
-                .logoutSuccessHandler((req, res, auth) -> {
-                    res.setStatus(200);
-                    res.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                    res.getWriter().write("{\"message\":\"Logged out\"}");
-                })
-                .permitAll()
-            );
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-        var admin = User.builder()
-                .username("admin")
-                .password(encoder.encode("admin"))
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(admin);
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean

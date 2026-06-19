@@ -1,7 +1,37 @@
+function pageToUrl(p) {
+  if (!p || p === 'catalog') return '/';
+  if (p.startsWith('product-')) return '/product/' + p.replace('product-', '');
+  if (p.startsWith('admin-')) return '/admin/' + p.replace('admin-', '');
+  return '/' + p;
+}
+
+function urlToPage() {
+  var path = window.location.pathname;
+  if (path === '/' || path === '/catalog') return 'catalog';
+  var m = path.match(/^\/product\/(\d+)$/);
+  if (m) return 'product-' + m[1];
+  if (path === '/admin') return 'admin';
+  m = path.match(/^\/(admin\/.+)$/);
+  if (m) return m[1].replace('/', '-');
+  return path.replace(/^\//, '') || 'catalog';
+}
+
 function App() {
-  var _React$useState = React.useState('catalog');
+  var _React$useState = React.useState(urlToPage);
   var page = _React$useState[0];
   var setPage = _React$useState[1];
+
+  var navigate = React.useCallback(function(p) {
+    var url = pageToUrl(p);
+    history.pushState(null, '', url);
+    setPage(p);
+  }, []);
+
+  React.useEffect(function() {
+    function onPop() { setPage(urlToPage()); }
+    addEventListener('popstate', onPop);
+    return function() { removeEventListener('popstate', onPop); };
+  }, []);
 
   var initialCart = (function() {
     try { return JSON.parse(localStorage.getItem('cart')) || []; } catch(e) { return []; }
@@ -23,10 +53,11 @@ function App() {
   var setUser = _React$useState3[1];
 
   React.useEffect(function() {
-    fetch('/api/auth/status')
+    if (!getToken()) return;
+    fetchWithAuth('/api/auth/status')
       .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
       .then(function(d) { setUser(d); })
-      .catch(function() { setUser(null); });
+      .catch(function() { setToken(null); setUser(null); });
   }, []);
 
   var cartCount = cart.reduce(function(s, i) { return s + i.qty; }, 0);
@@ -38,30 +69,48 @@ function App() {
   }, []);
 
   var isAdminPage = page && (page === 'admin' || page.startsWith('admin-'));
-  var pageTitle = page && page.startsWith('product-') ? '\u0422\u043E\u0432\u0430\u0440' : (PAGE_TITLES[page] || '');
+  var canAccessAdmin = user && (user.role === 'ADMIN' || user.role === 'MANAGER');
+  var pageTitle = page && page.startsWith('product-') ? 'Товар' : (PAGE_TITLES[page] || '');
   var pageContent;
+
   if (isAdminPage && !user) {
     pageContent = React.createElement(LoginForm, {
-      onLogin: function(u) { setUser({ username: u }); },
-      onClose: function() { setPage('catalog'); }
+      onLogin: function(u, r) { setUser({ username: u, role: r }); navigate(page); },
+      onClose: function() { navigate('catalog'); }
     });
+  } else if (isAdminPage && !canAccessAdmin) {
+    pageContent = React.createElement('div', { className: 'empty' },
+      React.createElement('i', { className: 'ti ti-lock' }),
+      React.createElement('h3', null, 'Доступ запрещён'),
+      React.createElement('p', null, 'У вас нет прав для доступа к этому разделу')
+    );
   } else if (page && page.startsWith('product-')) {
-    pageContent = React.createElement(ProductDetail, { page: page, setPage: setPage });
+    pageContent = React.createElement(ProductDetail, { page: page, setPage: navigate });
+  } else if (page === 'login') {
+    pageContent = React.createElement(LoginForm, {
+      onLogin: function(u, r) { setUser({ username: u, role: r }); navigate('catalog'); },
+      onClose: function() { navigate('catalog'); }
+    });
+  } else if (page === 'register') {
+    pageContent = React.createElement(RegisterForm, {
+      onRegister: function(u, r) { setUser({ username: u, role: r }); navigate('catalog'); },
+      onClose: function() { navigate('login'); }
+    });
   } else {
     var Comp = ROUTES[page] || ROUTES.catalog;
-    pageContent = React.createElement(Comp, { setPage: setPage });
+    pageContent = React.createElement(Comp, { setPage: navigate });
   }
 
-  return React.createElement(AppCtx.Provider, { value: { cart: cart, dispatch: dispatch, toast: addToast, user: user, setUser: setUser, setPage: setPage } },
+  return React.createElement(AppCtx.Provider, { value: { cart: cart, dispatch: dispatch, toast: addToast, user: user, setUser: setUser, navigate: navigate } },
     React.createElement('div', { className: 'layout' },
-      React.createElement(Sidebar, { page: page, setPage: setPage, cartCount: cartCount, user: user, setUser: setUser }),
+      React.createElement(Sidebar, { page: page, cartCount: cartCount, user: user, setUser: setUser }),
       React.createElement('div', { className: 'main' },
         React.createElement('div', { className: 'topbar' },
           React.createElement('span', { className: 'topbar-title' }, pageTitle),
           React.createElement('div', { className: 'topbar-actions' },
-            page === 'catalog' && React.createElement('button', { className: 'btn btn-secondary btn-sm', onClick: function() { setPage('cart'); } },
+            page === 'catalog' && React.createElement('button', { className: 'btn btn-secondary btn-sm', onClick: function() { navigate('cart'); } },
               React.createElement('i', { className: 'ti ti-shopping-cart' }),
-              '\u041A\u043E\u0440\u0437\u0438\u043D\u0430',
+              'Корзина',
               cartCount > 0 && React.createElement('span', { className: 'nav-badge', style: { background: 'var(--accent)' } }, cartCount)
             )
           )

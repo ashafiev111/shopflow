@@ -12,7 +12,7 @@ function AdminOrders() {
 
   function loadOrders() {
     setLoading(true);
-    fetch('/api/orders')
+    fetchWithAuth('/api/orders')
       .then(function(r) { return r.json(); })
       .then(function(data) { setOrders(data); setLoading(false); })
       .catch(function() { setLoading(false); toast('error', '\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u0437\u0430\u043A\u0430\u0437\u043E\u0432'); });
@@ -21,7 +21,7 @@ function AdminOrders() {
   React.useEffect(loadOrders, []);
 
   function handleStatusChange(id, status) {
-    fetch('/api/orders/' + id + '/status', {
+    fetchWithAuth('/api/orders/' + id + '/status', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: status })

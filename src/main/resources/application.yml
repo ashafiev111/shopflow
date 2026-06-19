@@ -3,14 +3,14 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/magazin
-    username: postgres
-    password: 123
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/magazin}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:123}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -19,7 +19,7 @@ spring:
     type: redis
   data:
     redis:
-      host: localhost
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: 6379
   servlet:
     multipart:
@@ -31,4 +31,6 @@ spring:
     baseline-on-migrate: true
 
 app:
-  upload-dir: uploads
+  upload-dir: ${APP_UPLOAD_DIR:uploads}
+  jwt:
+    secret: ${APP_JWT_SECRET:dGhpc0lzQVZlcnlTZWNyZXRLZXlGb3JKd3RBdXRoZW50aWNhdGlvbkAxMjM0NTY3ODkw}

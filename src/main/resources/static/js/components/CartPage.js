@@ -1,15 +1,16 @@
 function CartPage(_ref) {
-  var setPage = _ref.setPage;
   var _React$useContext = React.useContext(AppCtx);
   var cart = _React$useContext.cart;
   var dispatch = _React$useContext.dispatch;
   var toast = _React$useContext.toast;
+  var navigate = _React$useContext.navigate;
+  var user = _React$useContext.user;
 
   var _React$useState = React.useState(false);
   var showCheckout = _React$useState[0];
   var setShowCheckout = _React$useState[1];
 
-  var _React$useState2 = React.useState({ name: '\u0418\u0432\u0430\u043D \u041F\u0435\u0442\u0440\u043E\u0432', phone: '+7 (999) 123-45-67', address: '\u041C\u043E\u0441\u043A\u0432\u0430, \u0443\u043B. \u041B\u0435\u043D\u0438\u043D\u0430, 12, \u043A\u0432. 34', comment: '' });
+  var _React$useState2 = React.useState({ name: 'Иван Петров', phone: '+7 (999) 123-45-67', address: 'Москва, ул. Ленина, 12, кв. 34', comment: '' });
   var form = _React$useState2[0];
   var setForm = _React$useState2[1];
 
@@ -23,7 +24,7 @@ function CartPage(_ref) {
   function handleOrder() {
     setSubmitting(true);
     var items = cart.map(function(i) { return { productId: i.id, qty: i.qty }; });
-    fetch('/api/orders', {
+    var opts = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -33,7 +34,8 @@ function CartPage(_ref) {
         comment: form.comment,
         items: items
       })
-    })
+    };
+    (user ? fetchWithAuth('/api/orders', opts) : fetch('/api/orders', opts))
     .then(function(r) {
       if (!r.ok) throw new Error('Order failed');
       return r.json();
@@ -43,7 +45,7 @@ function CartPage(_ref) {
       setShowCheckout(false);
       setSubmitting(false);
       toast('success', '\u0417\u0430\u043A\u0430\u0437 \u0443\u0441\u043F\u0435\u0448\u043D\u043E \u043E\u0444\u043E\u0440\u043C\u043B\u0435\u043D!');
-      setPage('orders');
+      navigate('orders');
     })
     .catch(function() {
       setSubmitting(false);
@@ -56,7 +58,7 @@ function CartPage(_ref) {
       React.createElement('i', { className: 'ti ti-shopping-cart' }),
       React.createElement('h3', null, '\u041A\u043E\u0440\u0437\u0438\u043D\u0430 \u043F\u0443\u0441\u0442\u0430'),
       React.createElement('p', null, '\u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0442\u043E\u0432\u0430\u0440\u044B \u0438\u0437 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430'),
-      React.createElement('button', { className: 'btn btn-primary', style: { marginTop: 16 }, onClick: function() { setPage('catalog'); } },
+      React.createElement('button', { className: 'btn btn-primary', style: { marginTop: 16 }, onClick: function() { navigate('catalog'); } },
         React.createElement('i', { className: 'ti ti-arrow-left' }), ' \u0412 \u043A\u0430\u0442\u0430\u043B\u043E\u0433'
       )
     );
@@ -111,7 +113,7 @@ function CartPage(_ref) {
           },
             React.createElement('i', { className: 'ti ti-credit-card' }), ' \u041E\u0444\u043E\u0440\u043C\u0438\u0442\u044C \u0437\u0430\u043A\u0430\u0437'
           ),
-          React.createElement('button', { className: 'btn btn-ghost', style: { width: '100%', justifyContent: 'center', marginTop: 8 }, onClick: function() { setPage('catalog'); } },
+          React.createElement('button', { className: 'btn btn-ghost', style: { width: '100%', justifyContent: 'center', marginTop: 8 }, onClick: function() { navigate('catalog'); } },
             '\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C \u043F\u043E\u043A\u0443\u043F\u043A\u0438'
           )
         )

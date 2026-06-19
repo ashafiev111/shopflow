@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.magazin.dto.ProductDto;
 import org.example.magazin.model.Product;
 import org.example.magazin.service.ProductService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +21,14 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<Product> getAll(
+    public Page<Product> getAll(
             @RequestParam(required = false) Long category,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String sort
+            @RequestParam(required = false) String sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        return productService.findAll(category, search, sort);
+        return productService.findAll(category, search, sort, page, size);
     }
 
     @GetMapping("/{id}")

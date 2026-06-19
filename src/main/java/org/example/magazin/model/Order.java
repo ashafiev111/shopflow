@@ -34,6 +34,9 @@ public class Order implements Serializable {
     @Column(nullable = false, length = 20)
     private String phone;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 }

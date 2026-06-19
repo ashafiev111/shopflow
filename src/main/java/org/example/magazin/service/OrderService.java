@@ -38,8 +38,15 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<OrderDto> findByUserId(Long userId) {
+        return orderRepository.findByUserIdOrderByDateDesc(userId).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
-    public OrderDto create(CreateOrderRequest request) {
+    public OrderDto create(CreateOrderRequest request, Long userId) {
         String orderId = "ORD-" + String.format("%04d", orderIdCounter.incrementAndGet());
 
         Order order = new Order();
@@ -49,6 +56,7 @@ public class OrderService {
         order.setPhone(request.getPhone());
         order.setAddress(request.getAddress());
         order.setStatus("pending");
+        order.setUserId(userId);
 
         int total = 0;
         for (CreateOrderRequest.OrderItemRequest itemReq : request.getItems()) {
@@ -86,6 +94,7 @@ public class OrderService {
         dto.setCustomer(order.getCustomer());
         dto.setAddress(order.getAddress());
         dto.setPhone(order.getPhone());
+        dto.setUserId(order.getUserId());
         dto.setItems(order.getItems().stream().map(item -> {
             OrderDto.OrderItemDto itemDto = new OrderDto.OrderItemDto();
             itemDto.setName(item.getName());

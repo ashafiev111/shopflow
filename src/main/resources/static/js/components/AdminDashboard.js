@@ -17,8 +17,8 @@ function AdminDashboard() {
 
   React.useEffect(function() {
     Promise.all([
-      fetch('/api/orders').then(function(r) { return r.json(); }),
-      fetch('/api/products').then(function(r) { return r.json(); }),
+      fetchWithAuth('/api/orders').then(function(r) { return r.json(); }),
+      fetch('/api/products?size=9999').then(function(r) { return r.json(); }),
       fetch('/api/categories').then(function(r) { return r.json(); })
     ])
     .then(function(_ref) {
@@ -26,7 +26,7 @@ function AdminDashboard() {
       var p = _ref[1];
       var c = _ref[2];
       setOrders(o);
-      setProducts(p);
+      setProducts(p.content || p);
       setCategories(c);
       setLoading(false);
     })

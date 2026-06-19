@@ -1,5 +1,5 @@
-function LoginForm(_ref) {
-  var onLogin = _ref.onLogin;
+function RegisterForm(_ref) {
+  var onRegister = _ref.onRegister;
   var onClose = _ref.onClose;
 
   var _React$useContext = React.useContext(AppCtx);
@@ -23,28 +23,31 @@ function LoginForm(_ref) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (username.length < 3) { setError('Логин должен быть минимум 3 символа'); return; }
+    if (password.length < 4) { setError('Пароль должен быть минимум 4 символа'); return; }
     setLoading(true);
     setError('');
-    fetch('/api/auth/login', {
+    fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: username, password: password })
     })
     .then(function(r) {
       if (r.ok) return r.json();
-      throw new Error('Invalid credentials');
+      if (r.status === 409) throw new Error('Это имя уже занято');
+      throw new Error('Ошибка регистрации');
     })
     .then(function(d) {
       setToken(d.token);
-      onLogin(d.username, d.role);
+      onRegister(d.username, d.role);
     })
-    .catch(function() { setError('Неверный логин или пароль'); setLoading(false); });
+    .catch(function(e) { setError(e.message); setLoading(false); });
   }
 
   return React.createElement('div', { className: 'overlay' },
     React.createElement('div', { className: 'modal', style: { maxWidth: 380 } },
       React.createElement('div', { className: 'modal-header' },
-        React.createElement('h3', null, 'Вход'),
+        React.createElement('h3', null, 'Регистрация'),
         React.createElement('button', { className: 'btn btn-ghost btn-icon', onClick: onClose }, React.createElement('i', { className: 'ti ti-x' }))
       ),
       React.createElement('form', { onSubmit: handleSubmit },
@@ -52,16 +55,16 @@ function LoginForm(_ref) {
           error && React.createElement('div', { style: { padding: '8px 12px', borderRadius: 8, background: 'var(--danger-bg)', color: 'var(--danger)', marginBottom: 12, textAlign: 'center', fontSize: 13 } }, error),
           React.createElement('div', { className: 'form-group' },
             React.createElement('label', { className: 'form-label' }, 'Логин'),
-            React.createElement('input', { className: 'form-input', placeholder: 'admin', value: username, onChange: function(e) { setUsername(e.target.value); }, autoFocus: true })
+            React.createElement('input', { className: 'form-input', placeholder: 'user123', value: username, onChange: function(e) { setUsername(e.target.value); }, autoFocus: true })
           ),
           React.createElement('div', { className: 'form-group' },
             React.createElement('label', { className: 'form-label' }, 'Пароль'),
-            React.createElement('input', { className: 'form-input', type: 'password', placeholder: 'admin', value: password, onChange: function(e) { setPassword(e.target.value); } })
+            React.createElement('input', { className: 'form-input', type: 'password', placeholder: 'Создайте пароль', value: password, onChange: function(e) { setPassword(e.target.value); } })
           )
         ),
         React.createElement('div', { className: 'modal-footer' },
-          React.createElement('button', { type: 'button', className: 'btn btn-secondary', onClick: function() { onClose(); navigate('register'); } }, 'Регистрация'),
-          React.createElement('button', { type: 'submit', className: 'btn btn-primary', disabled: loading }, loading ? 'Вход...' : 'Войти')
+          React.createElement('button', { type: 'button', className: 'btn btn-secondary', onClick: function() { onClose(); navigate('login'); } }, 'Уже есть аккаунт?'),
+          React.createElement('button', { type: 'submit', className: 'btn btn-primary', disabled: loading }, loading ? 'Регистрация...' : 'Зарегистрироваться')
         )
       )
     )
