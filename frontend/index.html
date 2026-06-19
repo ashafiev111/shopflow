@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopFlow — интернет-магазин</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- DATA + CONTEXT -->
+  <script src="js/data.js"></script>
+  <script src="js/context.js"></script>
+
+  <!-- COMPONENTS -->
+  <script src="js/components/Toasts.js"></script>
+  <script src="js/components/Sidebar.js"></script>
+  <script src="js/components/CatalogPage.js"></script>
+  <script src="js/components/CartPage.js"></script>
+  <script src="js/components/OrdersPage.js"></script>
+  <script src="js/components/AdminDashboard.js"></script>
+  <script src="js/components/AdminProducts.js"></script>
+  <script src="js/components/AdminOrders.js"></script>
+  <script src="js/components/AdminCats.js"></script>
+  <script src="js/components/LoginForm.js"></script>
+  <script src="js/components/ProductDetail.js"></script>
+
+  <!-- ⦿ РУТЫ (маршруты) ⦿ -->
+  <script>
+    const ROUTES = {
+      catalog: CatalogPage,
+      cart: CartPage,
+      orders: OrdersPage,
+      admin: AdminDashboard,
+      'admin-products': AdminProducts,
+      'admin-orders': AdminOrders,
+      'admin-cats': AdminCats,
+    };
+  </script>
+
+  <!-- APP ENTRY -->
+  <script src="js/App.js"></script>
+  <script type="text/babel">
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

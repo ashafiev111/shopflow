@@ -1,0 +1,15 @@
+UPDATE products SET image_url = 'https://picsum.photos/seed/laptop/400/300'    WHERE id = 1 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/headphones/400/300' WHERE id = 2 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/phone/400/300'      WHERE id = 3 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/watch/400/300'      WHERE id = 4 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/jeans/400/300'      WHERE id = 5 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/sneakers/400/300'   WHERE id = 6 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/jacket/400/300'     WHERE id = 7 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/coffee/400/300'     WHERE id = 8 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/vacuum/400/300'     WHERE id = 9 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/yoga/400/300'       WHERE id = 10 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/dumbbell/400/300'   WHERE id = 11 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/atomic/400/300'     WHERE id = 12 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/thinking/400/300'   WHERE id = 13 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/serum/400/300'      WHERE id = 14 AND image_url IS NULL;
+UPDATE products SET image_url = 'https://picsum.photos/seed/perfume/400/300'    WHERE id = 15 AND image_url IS NULL;
