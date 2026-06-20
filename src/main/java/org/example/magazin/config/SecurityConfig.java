@@ -41,7 +41,8 @@ public class SecurityConfig {
                     "/css/**", "/js/**", "/uploads/**",
                     "/cart", "/orders",
                     "/admin", "/admin/**",
-                    "/product/**", "/reviews/**"
+                    "/product/**", "/reviews/**",
+                    "/swagger-ui/**", "/v3/api-docs/**"
                 ).permitAll()
                 .requestMatchers("/api/users", "/api/users/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").hasAnyRole("ADMIN", "MANAGER")
