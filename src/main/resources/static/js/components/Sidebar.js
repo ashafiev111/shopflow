@@ -5,11 +5,17 @@ function Sidebar(_ref) {
   var setUser = _ref.setUser;
   var _React$useContext = React.useContext(AppCtx);
   var navigate = _React$useContext.navigate;
+  var theme = _React$useContext.theme;
+  var setTheme = _React$useContext.setTheme;
 
   function handleLogout() {
     setToken(null);
     setUser(null);
     navigate('catalog');
+  }
+
+  function toggleTheme() {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   }
 
   return React.createElement('nav', { className: 'sidebar' },
@@ -38,6 +44,10 @@ function Sidebar(_ref) {
           item.badge && cartCount > 0 && React.createElement('span', { className: 'nav-badge' }, cartCount)
         );
       })
+    ),
+    React.createElement('div', { className: 'theme-switch', onClick: toggleTheme },
+      React.createElement('i', { className: 'ti ' + (theme === 'dark' ? 'ti-moon' : 'ti-sun') }),
+      React.createElement('div', { className: 'toggle-track' })
     ),
     React.createElement('div', { style: { padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)' } },
       user

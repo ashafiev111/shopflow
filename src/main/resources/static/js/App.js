@@ -66,6 +66,17 @@ function App() {
   var user = _React$useState3[0];
   var setUser = _React$useState3[1];
 
+  var _React$useState4 = React.useState(function() {
+    return document.documentElement.getAttribute('data-theme') || 'light';
+  });
+  var theme = _React$useState4[0];
+  var setTheme = _React$useState4[1];
+
+  React.useEffect(function() {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
   React.useEffect(function() {
     if (!getToken()) return;
     fetchWithAuth('/api/auth/status')
@@ -121,7 +132,7 @@ function App() {
     pageContent = React.createElement(Comp, { setPage: navigate });
   }
 
-  return React.createElement(AppCtx.Provider, { value: { cart: cart, dispatch: dispatch, favorites: favorites, favDispatch: favDispatch, toast: addToast, user: user, setUser: setUser, navigate: navigate } },
+  return React.createElement(AppCtx.Provider, { value: { cart: cart, dispatch: dispatch, favorites: favorites, favDispatch: favDispatch, toast: addToast, user: user, setUser: setUser, navigate: navigate, theme: theme, setTheme: setTheme } },
     React.createElement('div', { className: 'layout' },
       React.createElement(Sidebar, { page: page, cartCount: cartCount, user: user, setUser: setUser }),
       React.createElement('div', { className: 'main' },
