@@ -31,12 +31,20 @@ public class SecurityConfig {
                 })
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/orders", "/api/auth/status").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**", "/api/orders", "/api/auth/status", "/api/products/*/reviews").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register", "/api/orders").permitAll()
+                .requestMatchers("/api/users/me", "/api/users/me/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/products/*/reviews").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/reviews/*").authenticated()
+                .requestMatchers(
+                    "/", "/index.html",
+                    "/css/**", "/js/**", "/uploads/**",
+                    "/cart", "/orders",
+                    "/admin", "/admin/**",
+                    "/product/**", "/reviews/**"
+                ).permitAll()
                 .requestMatchers("/api/users", "/api/users/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/uploads/**",
-                    "/cart", "/orders", "/admin", "/admin/**", "/product/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

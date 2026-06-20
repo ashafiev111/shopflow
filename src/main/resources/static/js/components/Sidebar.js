@@ -13,7 +13,7 @@ function Sidebar(_ref) {
   }
 
   return React.createElement('nav', { className: 'sidebar' },
-    React.createElement('div', { className: 'sidebar-logo' },
+    React.createElement('div', { className: 'sidebar-logo', style: { cursor: 'pointer' }, onClick: function() { navigate('catalog'); } },
       React.createElement('h1', null, 'ShopFlow'),
       React.createElement('span', null, 'Интернет-магазин')
     ),
@@ -23,6 +23,9 @@ function Sidebar(_ref) {
           return React.createElement('div', { key: i, className: 'sidebar-section' }, item.section);
         }
         if (item.roles && (!user || item.roles.indexOf(user.role) === -1)) {
+          return null;
+        }
+        if (item.auth && !user) {
           return null;
         }
         return React.createElement('button', {
@@ -39,8 +42,8 @@ function Sidebar(_ref) {
     React.createElement('div', { style: { padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)' } },
       user
         ? React.createElement('div', { className: 'flex-center gap-2' },
-            React.createElement('div', { className: 'avatar' }, user.username.charAt(0).toUpperCase()),
-            React.createElement('div', { style: { flex: 1 } },
+            React.createElement('div', { className: 'avatar', style: { cursor: 'pointer' }, onClick: function() { navigate('profile'); } }, user.username.charAt(0).toUpperCase()),
+            React.createElement('div', { style: { flex: 1, cursor: 'pointer' }, onClick: function() { navigate('profile'); } },
               React.createElement('div', { style: { fontSize: 13, fontWeight: 600, color: '#fff' } }, user.username),
               React.createElement('div', { style: { fontSize: 11, color: ROLE_COLORS[user.role] || 'rgba(255,255,255,0.4)' } }, ROLE_LABELS[user.role] || user.role)
             ),

@@ -6,6 +6,8 @@ function CatalogPage(_ref) {
   var dispatch = _React$useContext.dispatch;
   var toast = _React$useContext.toast;
   var navigate = _React$useContext.navigate;
+  var favorites = _React$useContext.favorites;
+  var favDispatch = _React$useContext.favDispatch;
 
   var _useState = React.useState([]);
   var products = _useState[0];
@@ -99,6 +101,12 @@ function CatalogPage(_ref) {
     toast('success', '\u00AB' + p.name + '\u00BB \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D \u0432 \u043A\u043E\u0440\u0437\u0438\u043D\u0443');
   }
 
+  function toggleFav(id) {
+    var isFav = favorites.indexOf(id) !== -1;
+    favDispatch({ type: isFav ? 'REMOVE' : 'ADD', id: id });
+    toast('success', isFav ? '\u0423\u0434\u0430\u043B\u0435\u043D\u043E \u0438\u0437 \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0433\u043E' : '\u0414\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u043E \u0432 \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435');
+  }
+
   function catName(id) { var c = categories.find(function(c) { return c.id === id; }); return c ? c.name : ''; }
 
   function pageButtons() {
@@ -187,13 +195,24 @@ function CatalogPage(_ref) {
                         React.createElement('span', { className: 'product-price' }, p.price.toLocaleString() + ' ₽'),
                         p.oldPrice && React.createElement('span', { className: 'product-old' }, p.oldPrice.toLocaleString() + ' ₽')
                       ),
-                      React.createElement('button', {
-                        className: 'btn btn-sm ' + (cartIds.has(p.id) ? 'btn-secondary' : 'btn-primary'),
-                        onClick: function(e) { e.stopPropagation(); addToCart(p); }
-                      },
-                        cartIds.has(p.id)
-                          ? [React.createElement('i', { key: 'i', className: 'ti ti-check' }), ' В корзине']
-                          : [React.createElement('i', { key: 'i', className: 'ti ti-plus' }), ' Купить']
+                      React.createElement('div', { className: 'flex-center gap-2' },
+                        React.createElement('button', {
+                          className: 'btn btn-sm btn-secondary',
+                          onClick: function(e) { e.stopPropagation(); toggleFav(p.id); }
+                        },
+                          React.createElement('i', {
+                            className: 'ti ti-heart',
+                            style: { color: favorites.indexOf(p.id) !== -1 ? '#dc2626' : '' }
+                          })
+                        ),
+                        React.createElement('button', {
+                          className: 'btn btn-sm ' + (cartIds.has(p.id) ? 'btn-secondary' : 'btn-primary'),
+                          onClick: function(e) { e.stopPropagation(); addToCart(p); }
+                        },
+                          cartIds.has(p.id)
+                            ? [React.createElement('i', { key: 'i', className: 'ti ti-check' }), ' В корзине']
+                            : [React.createElement('i', { key: 'i', className: 'ti ti-plus' }), ' Купить']
+                        )
                       )
                     )
                   )

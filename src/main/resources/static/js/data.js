@@ -7,6 +7,7 @@ var ROLE_COLORS = { CLIENT: 'rgba(255,255,255,0.4)', MANAGER: '#f59e0b', ADMIN: 
 var MENU = [
   { section: 'Магазин' },
   { id: 'catalog', label: 'Каталог', icon: 'ti-layout-grid' },
+  { id: 'favorites', label: 'Избранное', icon: 'ti-heart', auth: true },
   { id: 'cart', label: 'Корзина', icon: 'ti-shopping-cart', badge: true },
   { id: 'orders', label: 'Заказы', icon: 'ti-receipt' },
   { section: 'Управление' },
@@ -21,6 +22,8 @@ var PAGE_TITLES = {
   catalog: 'Каталог товаров',
   cart: 'Корзина',
   orders: 'Мои заказы',
+  favorites: 'Избранное',
+  profile: 'Мой профиль',
   login: 'Вход',
   register: 'Регистрация',
   admin: 'Панель управления',

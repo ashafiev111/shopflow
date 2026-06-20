@@ -13,3 +13,12 @@ function cartReducer(state, action) {
     default: return state;
   }
 }
+
+function favoritesReducer(state, action) {
+  switch (action.type) {
+    case 'ADD': return state.indexOf(action.id) === -1 ? state.concat([action.id]) : state;
+    case 'REMOVE': return state.filter(function(i) { return i !== action.id; });
+    case 'LOAD': return action.ids || [];
+    default: return state;
+  }
+}

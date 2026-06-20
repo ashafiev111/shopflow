@@ -1,6 +1,7 @@
 function pageToUrl(p) {
   if (!p || p === 'catalog') return '/';
   if (p.startsWith('product-')) return '/product/' + p.replace('product-', '');
+  if (p.startsWith('reviews-')) return '/reviews/' + p.replace('reviews-', '');
   if (p.startsWith('admin-')) return '/admin/' + p.replace('admin-', '');
   return '/' + p;
 }
@@ -10,6 +11,8 @@ function urlToPage() {
   if (path === '/' || path === '/catalog') return 'catalog';
   var m = path.match(/^\/product\/(\d+)$/);
   if (m) return 'product-' + m[1];
+  m = path.match(/^\/reviews\/(\d+)$/);
+  if (m) return 'reviews-' + m[1];
   if (path === '/admin') return 'admin';
   m = path.match(/^\/(admin\/.+)$/);
   if (m) return m[1].replace('/', '-');
@@ -43,6 +46,17 @@ function App() {
   React.useEffect(function() {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
+
+  var initialFav = (function() {
+    try { return JSON.parse(localStorage.getItem('favorites')) || []; } catch(e) { return []; }
+  })();
+  var _React$useReducer2 = React.useReducer(favoritesReducer, initialFav);
+  var favorites = _React$useReducer2[0];
+  var favDispatch = _React$useReducer2[1];
+
+  React.useEffect(function() {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
 
   var _React$useState2 = React.useState([]);
   var toasts = _React$useState2[0];
@@ -86,6 +100,12 @@ function App() {
     );
   } else if (page && page.startsWith('product-')) {
     pageContent = React.createElement(ProductDetail, { page: page, setPage: navigate });
+  } else if (page && page.startsWith('reviews-')) {
+    pageContent = React.createElement(ReviewsPage, { page: page, setPage: navigate });
+  } else if (page === 'profile') {
+    pageContent = React.createElement(ProfilePage, null);
+  } else if (page === 'favorites') {
+    pageContent = React.createElement(FavoritesPage, null);
   } else if (page === 'login') {
     pageContent = React.createElement(LoginForm, {
       onLogin: function(u, r) { setUser({ username: u, role: r }); navigate('catalog'); },
@@ -101,7 +121,7 @@ function App() {
     pageContent = React.createElement(Comp, { setPage: navigate });
   }
 
-  return React.createElement(AppCtx.Provider, { value: { cart: cart, dispatch: dispatch, toast: addToast, user: user, setUser: setUser, navigate: navigate } },
+  return React.createElement(AppCtx.Provider, { value: { cart: cart, dispatch: dispatch, favorites: favorites, favDispatch: favDispatch, toast: addToast, user: user, setUser: setUser, navigate: navigate } },
     React.createElement('div', { className: 'layout' },
       React.createElement(Sidebar, { page: page, cartCount: cartCount, user: user, setUser: setUser }),
       React.createElement('div', { className: 'main' },

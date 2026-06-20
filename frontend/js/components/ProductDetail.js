@@ -8,6 +8,9 @@ function ProductDetail(_ref) {
   var cart = _React$useContext.cart;
   var dispatch = _React$useContext.dispatch;
   var toast = _React$useContext.toast;
+  var navigate = _React$useContext.navigate;
+  var favorites = _React$useContext.favorites;
+  var favDispatch = _React$useContext.favDispatch;
 
   var _React$useState = React.useState(null);
   var product = _React$useState[0];
@@ -21,21 +24,37 @@ function ProductDetail(_ref) {
   var loading = _React$useState3[0];
   var setLoading = _React$useState3[1];
 
+  var _React$useState4 = React.useState(0);
+  var reviewCount = _React$useState4[0];
+  var setReviewCount = _React$useState4[1];
+
   React.useEffect(function() {
     setLoading(true);
     Promise.all([
       fetch('/api/products/' + productId).then(function(r) { return r.ok ? r.json() : Promise.reject(); }),
-      fetch('/api/categories').then(function(r) { return r.json(); })
+      fetch('/api/categories').then(function(r) { return r.json(); }),
+      fetch('/api/products/' + productId + '/reviews').then(function(r) { return r.json().then(function(d) { return Array.isArray(d) ? d : []; }); })
     ])
     .then(function(_ref2) {
       var p = _ref2[0];
       var c = _ref2[1];
+      var r = _ref2[2];
       setProduct(p);
       setCategories(c);
+      setReviewCount(r.length);
       setLoading(false);
     })
     .catch(function() { setLoading(false); });
   }, [productId]);
+
+  var catName = (function() { var c = categories.find(function(c) { return c.id === product.categoryId; }); return c ? c.name : ''; })();
+  var inCart = cart.some(function(i) { return i.id === product.id; });
+  var isFav = favorites.indexOf(productId) !== -1;
+
+  function toggleFav() {
+    favDispatch({ type: isFav ? 'REMOVE' : 'ADD', id: productId });
+    toast('success', isFav ? '\u0423\u0434\u0430\u043B\u0435\u043D\u043E \u0438\u0437 \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0433\u043E' : '\u0414\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u043E \u0432 \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435');
+  }
 
   if (loading) {
     return React.createElement('div', { className: 'empty' },
@@ -48,18 +67,15 @@ function ProductDetail(_ref) {
     return React.createElement('div', { className: 'empty' },
       React.createElement('i', { className: 'ti ti-mood-sad' }),
       React.createElement('h3', null, '\u0422\u043E\u0432\u0430\u0440 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D'),
-      React.createElement('button', { className: 'btn btn-primary', style: { marginTop: 16 }, onClick: function() { setPage('catalog'); } },
+      React.createElement('button', { className: 'btn btn-primary', style: { marginTop: 16 }, onClick: function() { navigate('catalog'); } },
         React.createElement('i', { className: 'ti ti-arrow-left' }), ' \u0412 \u043A\u0430\u0442\u0430\u043B\u043E\u0433'
       )
     );
   }
 
-  var catName = (function() { var c = categories.find(function(c) { return c.id === product.categoryId; }); return c ? c.name : ''; })();
-  var inCart = cart.some(function(i) { return i.id === product.id; });
-
   return React.createElement('div', { className: 'product-detail' },
     React.createElement('div', { className: 'product-detail-back' },
-      React.createElement('button', { className: 'btn btn-ghost', onClick: function() { setPage('catalog'); } },
+      React.createElement('button', { className: 'btn btn-ghost', onClick: function() { navigate('catalog'); } },
         React.createElement('i', { className: 'ti ti-arrow-left' }), ' \u041D\u0430\u0437\u0430\u0434 \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433'
       )
     ),
@@ -90,10 +106,30 @@ function ProductDetail(_ref) {
             : React.createElement('span', { style: { color: 'var(--danger)' } }, '\u041D\u0435\u0442 \u0432 \u043D\u0430\u043B\u0438\u0447\u0438\u0438')
         ),
         React.createElement('button', {
+          className: 'btn btn-secondary',
+          style: { width: '100%', justifyContent: 'center', padding: 12, fontSize: 15, marginTop: 8 },
+          onClick: toggleFav
+        },
+          React.createElement('i', {
+            key: 'i',
+            className: 'ti ti-heart',
+            style: { color: isFav ? '#dc2626' : '' }
+          }),
+          isFav ? ' \u0412 \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u043C' : ' \u0412 \u0438\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435'
+        ),
+        React.createElement('button', {
+          className: 'btn btn-secondary',
+          style: { width: '100%', justifyContent: 'center', padding: 12, fontSize: 15, marginTop: 8 },
+          onClick: function() { navigate('reviews-' + productId); }
+        },
+          React.createElement('i', { className: 'ti ti-message' }),
+          ' \u041E\u0442\u0437\u044B\u0432\u044B (' + reviewCount + ')'
+        ),
+        React.createElement('button', {
           className: 'btn ' + (inCart ? 'btn-secondary' : 'btn-primary'),
           style: { width: '100%', justifyContent: 'center', padding: 12, fontSize: 15, marginTop: 8 },
           onClick: function() {
-            if (inCart) { setPage('cart'); return; }
+            if (inCart) { navigate('cart'); return; }
             dispatch({ type: 'ADD', product: product });
             toast('success', '\u00AB' + product.name + '\u00BB \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D \u0432 \u043A\u043E\u0440\u0437\u0438\u043D\u0443');
           },
